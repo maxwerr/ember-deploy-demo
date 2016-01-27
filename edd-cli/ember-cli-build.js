@@ -1,5 +1,13 @@
 /* global require, module */
 var EmberApp = require('ember-cli/lib/broccoli/ember-app');
+var os = require('os');
+
+// use current ipv4 address to allow asset loading cross-network
+var ifaces = os.networkInterfaces();
+var ipv4AddressFamily = (ifaces.en0 || ifaces.eth0).filter(function(addObj) {
+  return addObj.family === 'IPv4';
+});
+var ipv4Address = (ipv4AddressFamily ||  [{address: 'localhost'}])[0].address;
 
 module.exports = function(defaults) {
   var env = EmberApp.env()|| 'development';
@@ -12,7 +20,8 @@ module.exports = function(defaults) {
 
   switch (env) {
     case 'development':
-      fingerprintOptions.prepend = 'http://localhost:4200/';
+      var address = (ifaces.en0 || ifaces.eth0).filter(function(addObj) { return addObj.family === 'IPv4' })[0].address
+      fingerprintOptions.prepend = 'http://' + ipv4Address + ':4200/';
     break;
     case 'staging':
       fingerprintOptions.prepend = 'TODO';
